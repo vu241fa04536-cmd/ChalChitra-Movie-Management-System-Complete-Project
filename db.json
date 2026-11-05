@@ -270,6 +270,26 @@
         "hotstar": "https://www.hotstar.com"
       },
       "id": 16
+    },
+    {
+      "title": "Awarapan 2",
+      "genre": "Drama",
+      "language": "Hindi",
+      "releaseYear": 2026,
+      "rating": 8,
+      "duration": "2hr 20 min",
+      "description": "Love story by movie by Emran Hashmi.",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX1CBL1ghfK5ggD9dG7NAII4OGy_KsuxtTwulgLfzScQ&s=10",
+      "trailer": "https://youtu.be/qkaSXCqdecM?si=I0-7rXpJwBSF_c3a",
+      "status": "released",
+      "type": "movie",
+      "uploadDate": "2026-09-24T06:33:17.209Z",
+      "watchLinks": {
+        "youtube": "https://www.youtube.com",
+        "netflix": "https://www.netflix.com",
+        "hotstar": "https://www.hotstar.com"
+      },
+      "id": 17
     }
   ],
   "users": [
@@ -281,13 +301,15 @@
         12,
         14,
         4,
-        1
+        1,
+        10
       ],
       "favorites": [
         1,
         3,
         12,
-        4
+        4,
+        14
       ],
       "id": 1
     }

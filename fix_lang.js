@@ -33,3 +33,4 @@ const newTranslations = `const translations = {
 
 code = code.replace(/const translations = \{[\s\S]*?\n\};\n/, newTranslations + '\n\n');
 fs.writeFileSync('js/utils.js', code, 'utf8');
+

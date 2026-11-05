@@ -1,19 +1,28 @@
-{
-  "name": "chalcitra",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+﻿{
+  "name": "chalchitra-mern",
+  "version": "2.0.0",
+  "description": "ChalChitra - Full-Stack MERN Movie Management & Streaming System",
+  "main": "server/server.js",
   "scripts": {
-    "start": "json-server --watch db.json --port 3000"
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "seed": "npm --prefix server run seed",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "build:client": "npm --prefix client run build",
+    "start": "npm --prefix server start"
   },
-  "keywords": [],
+  "keywords": [
+    "mern",
+    "mongodb",
+    "express",
+    "react",
+    "node",
+    "movie-management"
+  ],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "jsdom": "^29.1.1",
-    "json-server": "^0.17.4",
-    "pptxgenjs": "^4.0.1",
-    "puppeteer": "^25.12.0"
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }
