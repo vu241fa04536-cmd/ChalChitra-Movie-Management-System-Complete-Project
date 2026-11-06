@@ -1,4 +1,4 @@
-﻿const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const protect = async (req, res, next) => {
@@ -8,9 +8,14 @@ const protect = async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'chalchitra_secret');
       
-      // If it's an admin token generated directly
-      if (decoded.role === 'admin' && !decoded.id) {
-        req.user = { role: 'admin', username: 'Admin' };
+      // Handle admin tokens
+      if (decoded.role === 'admin') {
+        if (decoded.id) {
+          req.user = await User.findById(decoded.id).select('-password');
+        }
+        if (!req.user) {
+          req.user = { _id: decoded.id, role: 'admin', username: decoded.username || 'Admin' };
+        }
         return next();
       }
 

@@ -1,4 +1,5 @@
-﻿const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const User = require('../models/User');
 
 const generateToken = (payload) => {
@@ -89,8 +90,36 @@ const adminLogin = async (req, res, next) => {
     const requiredPassword = process.env.ADMIN_PASSWORD || 'ranjna@123';
 
     if (password === requiredPassword) {
-      const token = generateToken({ role: 'admin', username: 'Admin' });
+      let adminId = null;
+      if (mongoose.connection && mongoose.connection.readyState === 1) {
+        try {
+          let adminUser = await User.findOne({ username: 'Admin' });
+          if (!adminUser) {
+            adminUser = await User.create({
+              username: 'Admin',
+              password: requiredPassword,
+              email: 'admin@chalchitra.com',
+              role: 'admin',
+              watchlist: [],
+              favorites: [],
+            });
+          }
+          if (adminUser) {
+            adminId = adminUser._id;
+          }
+        } catch (dbErr) {
+          console.warn('[Admin Auth] Notice: Could not link to Mongo Admin document:', dbErr.message);
+        }
+      }
+
+      const tokenPayload = { role: 'admin', username: 'Admin' };
+      if (adminId) {
+        tokenPayload.id = adminId;
+      }
+
+      const token = generateToken(tokenPayload);
       res.json({
+        _id: adminId,
         role: 'admin',
         username: 'Admin',
         token,
@@ -108,8 +137,12 @@ const adminLogin = async (req, res, next) => {
 // @access  Private
 const getMe = async (req, res, next) => {
   try {
-    if (req.user.role === 'admin' && !req.user._id) {
+    if (req.user && req.user.role === 'admin' && !req.user._id) {
       return res.json({ role: 'admin', username: 'Admin' });
+    }
+
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: 'User identification not found' });
     }
 
     const user = await User.findById(req.user._id)

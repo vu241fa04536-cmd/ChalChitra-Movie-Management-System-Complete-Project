@@ -3,11 +3,7 @@
 <head>
     <script>
         window.onerror = function(msg, url, line, col, error) {
-            fetch('http://localhost:3000/error-log', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ error: msg, line: line })
-            }).catch(e => console.log(e));
+            console.warn('[ChalChitra View Error]', { message: msg, file: url, line: line });
         };
     </script>
     

@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authService } from '../services/authService';
 
 const AuthContext = createContext();
@@ -11,25 +11,45 @@ export const AuthProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Define logout before useEffect to prevent Temporal Dead Zone ReferenceError
+  const logout = useCallback(() => {
+    localStorage.removeItem('chalchitra_token');
+    setToken(null);
+    setUser(null);
+    setWatchlist([]);
+    setFavorites([]);
+  }, []);
+
   // Load user profile on startup if token exists
   useEffect(() => {
+    let isMounted = true;
     const loadUser = async () => {
       if (token) {
         try {
           const profile = await authService.getMe();
-          setUser(profile);
-          setWatchlist(profile.watchlist || []);
-          setFavorites(profile.favorites || []);
+          if (isMounted) {
+            setUser(profile);
+            setWatchlist(profile.watchlist || []);
+            setFavorites(profile.favorites || []);
+          }
         } catch (err) {
-          console.error('[Auth Error] Token expired or invalid', err.message);
-          logout();
+          console.warn('[Auth Notice] Session token expired or invalid, clearing state:', err.message);
+          if (isMounted) {
+            logout();
+          }
         }
       }
-      setLoading(false);
+      if (isMounted) {
+        setLoading(false);
+      }
     };
 
     loadUser();
-  }, [token]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [token, logout]);
 
   const login = async (username, password) => {
     const data = await authService.login(username, password);
@@ -51,14 +71,6 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const logout = () => {
-    localStorage.removeItem('chalchitra_token');
-    setToken(null);
-    setUser(null);
-    setWatchlist([]);
-    setFavorites([]);
-  };
-
   const adminLogin = async (password) => {
     const data = await authService.adminLogin(password);
     sessionStorage.setItem('chalchitra_admin_auth', 'true');
@@ -78,11 +90,12 @@ export const AuthProvider = ({ children }) => {
       alert('Please sign in to manage your watchlist!');
       return false;
     }
-    const res = await authService.toggleWatchlist(movie._id);
+    const movieId = movie && movie._id ? movie._id : movie;
+    const res = await authService.toggleWatchlist(movieId);
     if (res.isAdded) {
       setWatchlist((prev) => [...prev, movie]);
     } else {
-      setWatchlist((prev) => prev.filter((m) => (m._id || m) !== movie._id));
+      setWatchlist((prev) => prev.filter((m) => (m && (m._id || m)) !== movieId));
     }
     return res.isAdded;
   };
@@ -92,21 +105,24 @@ export const AuthProvider = ({ children }) => {
       alert('Please sign in to manage your favorites!');
       return false;
     }
-    const res = await authService.toggleFavorites(movie._id);
+    const movieId = movie && movie._id ? movie._id : movie;
+    const res = await authService.toggleFavorites(movieId);
     if (res.isAdded) {
       setFavorites((prev) => [...prev, movie]);
     } else {
-      setFavorites((prev) => prev.filter((m) => (m._id || m) !== movie._id));
+      setFavorites((prev) => prev.filter((m) => (m && (m._id || m)) !== movieId));
     }
     return res.isAdded;
   };
 
   const isInWatchlist = (movieId) => {
-    return watchlist.some((m) => (m._id ? m._id === movieId : m === movieId));
+    if (!movieId || !Array.isArray(watchlist)) return false;
+    return watchlist.some((m) => (m && m._id ? m._id === movieId : m === movieId));
   };
 
   const isInFavorites = (movieId) => {
-    return favorites.some((m) => (m._id ? m._id === movieId : m === movieId));
+    if (!movieId || !Array.isArray(favorites)) return false;
+    return favorites.some((m) => (m && m._id ? m._id === movieId : m === movieId));
   };
 
   return (

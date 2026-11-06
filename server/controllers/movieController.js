@@ -1,4 +1,4 @@
-﻿const Movie = require('../models/Movie');
+const Movie = require('../models/Movie');
 
 // @desc    Get all movies with filtering, search, and sorting
 // @route   GET /api/movies
@@ -98,20 +98,20 @@ const createMovie = async (req, res, next) => {
       watchLinks,
     } = req.body;
 
-    if (!title || !genre || !releaseYear || !poster) {
-      return res.status(400).json({ message: 'Title, genre, release year, and poster are required' });
+    if (!title || !genre || !releaseYear || !poster || !description || !description.trim()) {
+      return res.status(400).json({ message: 'Title, genre, release year, poster URL, and description are required' });
     }
 
     const movie = await Movie.create({
-      title,
-      genre,
-      language: language || 'English',
+      title: title.trim(),
+      genre: genre.trim(),
+      language: language ? language.trim() : 'English',
       releaseYear: Number(releaseYear),
       rating: rating ? Number(rating) : 0,
-      duration: duration || '120 min',
-      description: description || '',
-      poster,
-      trailer: trailer || '',
+      duration: duration ? duration.trim() : '120 min',
+      description: description.trim(),
+      poster: poster.trim(),
+      trailer: trailer ? trailer.trim() : '',
       status: status || 'released',
       type: type || 'movie',
       uploadDate: new Date(),
@@ -133,6 +133,10 @@ const createMovie = async (req, res, next) => {
 // @access  Private/Admin
 const updateMovie = async (req, res, next) => {
   try {
+    if (req.body.description !== undefined && typeof req.body.description === 'string' && !req.body.description.trim()) {
+      return res.status(400).json({ message: 'Movie description cannot be empty' });
+    }
+
     const { id } = req.params;
     let movie;
     if (id.match(/^[0-9a-fA-F]{24}$/)) {

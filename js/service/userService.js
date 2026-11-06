@@ -21,7 +21,7 @@ async function updateUser(id, userData) {
 
 async function loginUser(username, password) {
     try {
-        const response = await axios.get(`${USER_API_URL}?username=${username}&password=${password}`);
+        const response = await axios.get(`${USER_API_URL}?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
         return response.data;
     } catch (error) {
         handleApiError(error, "Login failed.");

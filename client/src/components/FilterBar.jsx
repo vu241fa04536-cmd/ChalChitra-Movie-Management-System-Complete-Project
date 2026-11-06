@@ -1,98 +1,149 @@
-﻿import React from 'react';
+import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
-const FilterBar = ({ filters, onFilterChange, onReset }) => {
+const GENRES = [
+  'all',
+  'Sci-Fi',
+  'Action',
+  'Drama',
+  'Thriller',
+  'Comedy',
+  'Romance',
+  'Animation',
+];
+
+const FilterBar = ({ filters = {}, onFilterChange, onReset }) => {
   const { t } = useLanguage();
 
-  const handleChange = (e) => {
+  const handleSelectChange = (e) => {
     const { name, value } = e.target;
     onFilterChange(name, value);
   };
 
+  const handleGenrePill = (genre) => {
+    onFilterChange('genre', genre);
+  };
+
+  const activeGenre = filters.genre || 'all';
+
   return (
-    <div className="filter-bar-container">
-      {/* Genre Filter */}
-      <div className="filter-group">
-        <label>{t('genre')}:</label>
-        <select
-          name="genre"
-          value={filters.genre || 'all'}
-          onChange={handleChange}
-          className="filter-select"
-        >
-          <option value="all">{t('allGenres')}</option>
-          <option value="Sci-Fi">Sci-Fi</option>
-          <option value="Action">Action</option>
-          <option value="Drama">Drama</option>
-          <option value="Thriller">Thriller</option>
-          <option value="Comedy">Comedy</option>
-          <option value="Romance">Romance</option>
-          <option value="Animation">Animation</option>
-        </select>
+    <div className="filter-console-card">
+      {/* 1. Quick Genre Filter Pills */}
+      <div className="filter-pills-row" role="tablist" aria-label="Genre quick filters">
+        {GENRES.map((genre) => {
+          const isActive = activeGenre === genre;
+          return (
+            <button
+              key={genre}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              className={`filter-pill-btn ${isActive ? 'active' : ''}`}
+              onClick={() => handleGenrePill(genre)}
+            >
+              {genre === 'all' ? (
+                <>
+                  <i className="fas fa-layer-group"></i>
+                  <span>{t('allGenres')}</span>
+                </>
+              ) : (
+                <span>{genre}</span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Language Filter */}
-      <div className="filter-group">
-        <label>{t('language')}:</label>
-        <select
-          name="language"
-          value={filters.language || 'all'}
-          onChange={handleChange}
-          className="filter-select"
-        >
-          <option value="all">{t('allLanguages')}</option>
-          <option value="English">English</option>
-          <option value="Hindi">Hindi</option>
-          <option value="Telugu">Telugu</option>
-        </select>
-      </div>
+      {/* 2. Controls Grid */}
+      <div className="filter-controls-grid">
+        {/* Language Filter */}
+        <div className="filter-field-wrap">
+          <label className="filter-field-label">
+            <i className="fas fa-globe text-cyan-400"></i>
+            <span>{t('language')}</span>
+          </label>
+          <div className="filter-select-wrapper">
+            <select
+              name="language"
+              value={filters.language || 'all'}
+              onChange={handleSelectChange}
+              className="filter-select-glass"
+              aria-label="Filter by language"
+            >
+              <option value="all">{t('allLanguages')}</option>
+              <option value="English">English</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Telugu">Telugu</option>
+            </select>
+            <i className="fas fa-chevron-down select-chevron" aria-hidden="true"></i>
+          </div>
+        </div>
 
-      {/* Category / Interest */}
-      <div className="filter-group">
-        <label>{t('yourInterest')}:</label>
-        <select
-          name="type"
-          value={filters.type || 'all'}
-          onChange={handleChange}
-          className="filter-select"
-        >
-          <option value="all">{t('allTypes')}</option>
-          <option value="movie">{t('movies')}</option>
-          <option value="webseries">{t('webseries')}</option>
-          <option value="cartoon">{t('cartoons')}</option>
-          <option value="short">{t('shortMovies')}</option>
-        </select>
-      </div>
+        {/* Category / Interest */}
+        <div className="filter-field-wrap">
+          <label className="filter-field-label">
+            <i className="fas fa-film text-[#f5c518]"></i>
+            <span>{t('yourInterest')}</span>
+          </label>
+          <div className="filter-select-wrapper">
+            <select
+              name="type"
+              value={filters.type || 'all'}
+              onChange={handleSelectChange}
+              className="filter-select-glass"
+              aria-label="Filter by category"
+            >
+              <option value="all">{t('allTypes')}</option>
+              <option value="movie">{t('movies')}</option>
+              <option value="webseries">{t('webseries')}</option>
+              <option value="cartoon">{t('cartoons')}</option>
+              <option value="short">{t('shortMovies')}</option>
+            </select>
+            <i className="fas fa-chevron-down select-chevron" aria-hidden="true"></i>
+          </div>
+        </div>
 
-      {/* Sort Option */}
-      <div className="filter-group">
-        <label>{t('sort')}:</label>
-        <select
-          name="sort"
-          value={filters.sort || 'recent'}
-          onChange={handleChange}
-          className="filter-select"
-        >
-          <option value="recent">{t('recent')}</option>
-          <option value="ratingDesc">{t('ratingDesc')}</option>
-          <option value="ratingAsc">{t('ratingAsc')}</option>
-          <option value="yearDesc">{t('yearDesc')}</option>
-          <option value="titleAsc">{t('titleAsc')}</option>
-        </select>
-      </div>
+        {/* Sort Option */}
+        <div className="filter-field-wrap">
+          <label className="filter-field-label">
+            <i className="fas fa-arrow-down-wide-short text-amber-400"></i>
+            <span>{t('sort')}</span>
+          </label>
+          <div className="filter-select-wrapper">
+            <select
+              name="sort"
+              value={filters.sort || 'recent'}
+              onChange={handleSelectChange}
+              className="filter-select-glass"
+              aria-label="Sort movies"
+            >
+              <option value="recent">{t('recent')}</option>
+              <option value="ratingDesc">{t('ratingDesc')}</option>
+              <option value="ratingAsc">{t('ratingAsc')}</option>
+              <option value="yearDesc">{t('yearDesc')}</option>
+              <option value="titleAsc">{t('titleAsc')}</option>
+            </select>
+            <i className="fas fa-chevron-down select-chevron" aria-hidden="true"></i>
+          </div>
+        </div>
 
-      {/* Reset Button */}
-      {onReset && (
-        <button
-          className="btn-outline"
-          onClick={onReset}
-          style={{ padding: '6px 12px', fontSize: '12px', marginLeft: 'auto' }}
-        >
-          <i className="fas fa-rotate-left"></i> Reset
-        </button>
-      )}
+        {/* Reset Filter Button */}
+        {onReset && (
+          <div className="filter-reset-wrap">
+            <button
+              type="button"
+              className="btn-outline btn-reset"
+              onClick={onReset}
+              title="Reset all filters"
+            >
+              <i className="fas fa-rotate-left"></i>
+              <span>Reset</span>
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default FilterBar;
+export default React.memo(FilterBar);

@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "chalchitra-server",
   "version": "1.0.0",
   "description": "Backend API for ChalChitra Movie Management System",
@@ -6,9 +6,16 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
+    "import:movies": "node seeder/safeImport.js",
     "seed": "node seeder/seed.js"
   },
-  "keywords": ["mern", "movie", "api", "express", "mongodb"],
+  "keywords": [
+    "mern",
+    "movie",
+    "api",
+    "express",
+    "mongodb"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -16,6 +23,8 @@
     "cors": "^2.8.5",
     "dotenv": "^17.3.1",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.7.3",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.13.0"
   }
